@@ -8,13 +8,13 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { PBR } from '@/BabylonExamples/PBR';
+import { CustomModels } from '@/BabylonExamples/CustomModels';
 
 export default defineComponent({
   name: 'BabylonExamples',
   mounted(){
     const canvas = document.querySelector("canvas")!;
-    new PBR(canvas);
+    new CustomModels(canvas);
   }
 });
 </script>
