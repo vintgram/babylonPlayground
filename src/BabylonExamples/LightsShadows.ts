@@ -1,6 +1,5 @@
-import { Scene,Engine, FreeCamera, Vector3, Light, HemisphericLight, MeshBuilder, AbstractMesh, SceneLoader, GlowLayer, LightGizmo, GizmoManager, Color3, DirectionalLight, PointLight } from "@babylonjs/core";
+import { Scene,Engine, FreeCamera, Vector3, Light, HemisphericLight, MeshBuilder, AbstractMesh, SceneLoader, GlowLayer, LightGizmo, GizmoManager, Color3, DirectionalLight, PointLight, SpotLight, ShadowGenerator } from "@babylonjs/core";
 import "@babylonjs/loaders";
-import { hydrateOnMediaQuery } from "vue";
 
 export class LightsShadows
 {
@@ -70,21 +69,47 @@ export class LightsShadows
         //     this.scene
         // );
 
-        const pointLight = new PointLight(
-            "pointLight",
-            Vector3.Up(),
+        // const pointLight = new PointLight(
+        //     "pointLight",
+        //     Vector3.Up(),
+        //     this.scene
+        // )
+
+        // pointLight.diffuse = new Color3(172/255,246/255,250/255);
+        // pointLight.intensity = 0.25;
+
+        // const pointClone = pointLight.clone("pointClone") as PointLight;
+
+        // pointLight.parent = this.lightTubes[0];
+        // pointClone.parent = this.lightTubes[1];
+
+        const spotLight = new SpotLight(
+            "spotLight",
+            new Vector3(0,0.5,-3),
+            new Vector3(0,1,3),
+            Math.PI/2,
+            10,
             this.scene
-        )
+        );
 
-        pointLight.diffuse = new Color3(172/255,246/255,250/255);
-        pointLight.intensity = 0.25;
+        spotLight.shadowMinZ = 1;
+        spotLight.shadowMaxZ = 10;
+        spotLight.intensity = 100;
 
-        const pointClone = pointLight.clone("pointClone") as PointLight;
+        spotLight.shadowEnabled = true;
 
-        pointLight.parent = this.lightTubes[0];
-        pointClone.parent = this.lightTubes[1];
+        const shadowGen = new ShadowGenerator(2048,spotLight);
+        shadowGen.useBlurCloseExponentialShadowMap = true;
 
-        this.CreateGizmos(pointLight);
+        this.ball.receiveShadows = true;
+        shadowGen.addShadowCaster(this.ball);
+
+        this.models.map(mesh => {
+            mesh.receiveShadows = true;
+            shadowGen.addShadowCaster(mesh);
+        })
+
+        this.CreateGizmos(spotLight);
     }
 
     CreateGizmos(customLight: Light): void {
